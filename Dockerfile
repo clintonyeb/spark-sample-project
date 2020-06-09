@@ -1,6 +1,4 @@
 # Creates pseudo distributed hadoop
-#
-# docker build -t hadoop .
 
 FROM debian AS HADOOP
 MAINTAINER Clinton Yeboah
@@ -82,26 +80,6 @@ RUN curl -sL --retry 3 \
   | tar x -C /usr/ \
  && mv /usr/$SPARK_PACKAGE $SPARK_HOME \
  && chown -R root:root $SPARK_HOME
-
-## Hdfs ports
-#EXPOSE 50010 50020 50070 50075 50090 8020 9000
-## Mapred ports
-#EXPOSE 10020 19888
-##Yarn ports
-#EXPOSE 8030 8031 8032 8033 8040 8042 8088
-##Other ports
-#EXPOSE 49707 2122 7077
-
-#Fix assembly plugin issue
-#RUN mkdir -p /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/ivys/
-#ADD http://dl.bintray.com/sbt/sbt-plugin-releases/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/ivys/ivy.xml /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/ivys
-#
-#RUN mkdir -p /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/jars/
-#ADD http://dl.bintray.com/sbt/sbt-plugin-releases/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/jars/sbt-assembly.jar /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/jars/
-#
-#RUN mkdir -p /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/srcs/
-#ADD http://dl.bintray.com/sbt/sbt-plugin-releases/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/srcs/sbt-assembly-sources.jar /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/srcs/
-#ADD http://dl.bintray.com/sbt/sbt-plugin-releases/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/srcs/sbt-assembly-tests-sources.jar /root/.ivy2/local/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.10/srcs/
 
 # SBT/SCALA
 ENV SBT_VERSION 1.3.12

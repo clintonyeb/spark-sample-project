@@ -1,7 +1,9 @@
-version: "2.2"
+version: "3"
 services:
   master:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-node
     command: bin/spark-class org.apache.spark.deploy.master.Master -h master
     hostname: master
     container_name: master
@@ -27,9 +29,12 @@ services:
       - ./data:/tmp/data
 
   worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-node
     command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
     hostname: worker
+    container_name: worker
     environment:
       SPARK_CONF_DIR: /conf
       SPARK_WORKER_CORES: 2
