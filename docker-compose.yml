@@ -12,6 +12,8 @@ services:
       SPARK_CONF_DIR: /conf
       SPARK_PUBLIC_DNS: localhost
     expose:
+      - 9000
+      - 8020
       - 7001
       - 7002
       - 7003
@@ -55,3 +57,8 @@ services:
     volumes:
       - ./conf/worker:/conf
       - ./data:/tmp/data
+
+
+volumes:
+  mydata:
+  dbdata:

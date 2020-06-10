@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SPARK_APPLICATION_JAR_LOCATION=`find /app/target -iname '*-assembly-*.jar' | head -n1`
+SPARK_APPLICATION_JAR_LOCATION=`find /app/target -iname '*.jar' | head -n1`
 export SPARK_APPLICATION_JAR_LOCATION
 
 if [ -z "$SPARK_APPLICATION_JAR_LOCATION" ]; then
@@ -13,7 +13,7 @@ SPARK_HOME=/usr/local/spark
 #${SPARK_HOME}/bin/run-example SparkPi
 
 ${SPARK_HOME}/bin/spark-submit \
-  --class "SimpleApp" \
+  --class "Main" \
   --master spark://master:7077 \
   "${SPARK_APPLICATION_JAR_LOCATION}"
 

@@ -65,10 +65,10 @@ ENV HDFS_DATANODE_USER root
 ENV HDFS_SECONDARYNAMENODE_USER root
 ENV YARN_RESOURCEMANAGER_USER root
 ENV YARN_NODEMANAGER_USER root
-
+ENV LD_LIBRARY_PATH $HADOOP_HOME/lib/native
 
 # SPARK
-ENV SPARK_VERSION 2.4.6
+ENV SPARK_VERSION 2.4.5
 ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-without-hadoop
 ENV SPARK_HOME /usr/local/spark
 ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/tools/lib/*"
