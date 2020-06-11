@@ -2,7 +2,7 @@
 name=spark-app
 
 # start services
-docker-compose up -d
+#docker-compose up -d
 
 # stop application
 docker stop $name && docker rm $name
@@ -18,4 +18,4 @@ docker run --network=final-project_default --name $name --rm -it --link master $
 #docker cp $name:/output ./output
 
 #  Shutdown services
-docker-compose down
+#docker-compose down

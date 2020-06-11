@@ -39,6 +39,11 @@ RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | s
 ENV JAVA_HOME /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64
 ENV PATH $PATH:$JAVA_HOME/bin
 
+# JAVAFX
+#RUN curl -# -L --retry 3 "https://download2.gluonhq.com/openjfx/11.0.2/openjfx-11.0.2_linux-x64_bin-sdk.zip" | unzip -d /usr/local/openjfx-11
+#ENV  PATH_TO_FX /usr/local/openjfx-11/lib
+
+
 # Hadoop
 ENV HADOOP_VERSION 3.0.0
 ENV HADOOP_HOME /usr/local/hadoop
@@ -104,7 +109,7 @@ WORKDIR /app
 ADD project /app/project
 ADD src /app/src
 ADD build.sbt /app/built.sbt
-ADD conf /app/conf
-ADD data /app/data
+#ADD conf /app/conf
+#ADD data /app/data
 RUN sbt clean assembly
 

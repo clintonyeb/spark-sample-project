@@ -1,8 +1,11 @@
+import org.apache.spark._
 import org.apache.spark.rdd.RDD
+import org.apache.spark.graphx._
+import org.apache.spark.sql.SparkSession
 
 import scala.collection.mutable
 
-case class PopulationTable(population: Double,noMean: Double, noVariance: Double, yesMean: Double, yesVariance: Double)
+case class PopulationTable(Population: Double, UnEmployedMean: Double, UnEmployedVariance: Double, EmployedMean: Double, EmployedVariance: Double)
 
 object Bootstrap extends Task {
   override def run(args: Array[String]): Unit = {
@@ -15,30 +18,67 @@ object Bootstrap extends Task {
 
     // employment and age
     val population = data.map(p => (p(6), p(4))).map(p => (p._1, p._2.toInt)).cache()
-    val popGroup = population.groupByKey().map(x => (x._1, (mean(x._2), variance(x._2)))).sortByKey()
-    println("Original:")
-    val originalResults = popGroup.collect()
-    print(originalResults)
+    val popGroup = population.groupByKey().map(x => (x._1, (mean(x._2), variance(x._2)))).sortByKey().cache()
+    val original:mutable.Map[String, (Double, Double)] = mutable.Map()
+    popGroup.collect().foreach(x => original(x._1) = x._2)
+
+    print("Original: ")
+    popGroup.collect().foreach(print)
+    println()
 
     def absoluteError(actual: Double, estimate: Double): Double = {
       ((actual - estimate).abs * 100) / actual
     }
 
+    val percentages = List(.05, .15, .25, .35, .45, .55, .65, .75, .85, .95)
+    val computed = percentages.map(p => (p, estimate(population, p)))
+      .map(e => {
+        val p = e._1
+        val est = e._2
+        PopulationTable(p,
+          absoluteError(original(original.keys.head)._1, est(original.keys.head)._1),
+          absoluteError(original(original.keys.head)._2, est(original.keys.head)._2),
+          absoluteError(original(original.keys.last)._1, est(original.keys.last)._1),
+          absoluteError(original(original.keys.last)._2, est(original.keys.last)._2))
+      })
+
     import spark.sqlContext.implicits._
 
-//    val computations = ListBuffer[collection.Map[String, (Double, Double)]]()
-    val percentages = List(5, 15, 25, 35, 45, 55, 65, 75, 85, 95)
-    val perc = spark.sparkContext.parallelize(percentages)
-    val df = perc.map(p => (p, estimate(population, p)))
-      .map(e => PopulationTable(e._1,
-        absoluteError(originalResults(0)._2._1, e._2("No")._1),
-        absoluteError(originalResults(0)._2._2, e._2("No")._2),
-        absoluteError(originalResults(1)._2._1, e._2("Yes")._1),
-        absoluteError(originalResults(1)._2._2, e._2("Yes")._2)))
-      .toDF()
-    df.show()
+    val df = computed.toDF()
+
+    // display
+    showTable(df)
+    val graph = showGraph(spark, df)
+    val graphsc = spark.sparkContext.parallelize(Seq(graph))
+    graphsc.saveAsTextFile(filePath("graph.json"))
 
     spark.stop()
+  }
+
+  def showTable(df: sql.DataFrame): Unit = {
+    df.show()
+  }
+
+  def showGraph(spark: SparkSession, df: sql.DataFrame): String = {
+    import vegas._
+    import vegas.sparkExt._
+
+    val plot = Vegas("Spark")
+    .withDataFrame(df)
+      .mark(Bar) // Change to .mark(Area)
+      .encodeX("spark", Nom, sortField= Sort("users count", AggOps.Mean))
+    .encodeY("users_count", Quant)
+
+    def renderHTML(): Unit = {
+      plot.html.pageHTML() + "\n" + // a complete HTML page containing the plot
+      plot.html.frameHTML("plot") // an iframe containing the plot
+    }
+
+    def renderWindow(): Unit = {
+      plot.window.show
+    }
+
+    plot.toJson
   }
 
   def estimate(population: RDD[(String, Int)], sampleSize: Double): collection.Map[String, (Double, Double)] = {
@@ -63,8 +103,9 @@ object Bootstrap extends Task {
     1.to(1000).foreach(_ => addToCache(resample(popSample), cache))
     val avg = cache.mapValues(v =>  (v._1 / 1000, v._2 / 1000))
 
-    println("Results:")
-    println(avg)
+    print(sampleSize + ": ")
+    print(avg)
+    println()
     avg
   }
 

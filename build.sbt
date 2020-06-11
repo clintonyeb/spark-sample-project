@@ -8,7 +8,10 @@ val sparkVersion = "2.4.5"
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided"
+  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-graphx" % sparkVersion % "provided",
+  "org.vegas-viz" %% "vegas" % "0.3.11",
+  "org.vegas-viz" %% "vegas-spark" % "0.3.11"
 )
 
 assemblyJarName in assembly := "final-project.jar"
