@@ -14,5 +14,6 @@ libraryDependencies ++= Seq(
   "org.vegas-viz" %% "vegas-spark" % "0.3.11"
 )
 
+test in assembly := {}
 assemblyJarName in assembly := "final-project.jar"
 mainClass in assembly := Some("Main")

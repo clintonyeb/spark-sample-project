@@ -93,23 +93,25 @@ RUN chown root:root /etc/bootstrap.sh \
 ENV BOOTSTRAP /etc/bootstrap.sh
 
 # SBT/SCALA
-ENV SBT_VERSION 1.3.12
-RUN \
-  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
-  dpkg -i sbt-$SBT_VERSION.deb && \
-  rm sbt-$SBT_VERSION.deb && \
-  apt-get update && \
-  apt-get install sbt && \
-  sbt sbtVersion
+#ENV SBT_VERSION 1.3.12
+#RUN \
+#  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
+#  dpkg -i sbt-$SBT_VERSION.deb && \
+#  rm sbt-$SBT_VERSION.deb && \
+#  apt-get update && \
+#  apt-get install sbt && \
+#  sbt sbtVersion
 
-ADD data /tmp/data
+# ADD data /tmp/data
 
 # Copy the source code and build the application
 WORKDIR /app
-ADD project /app/project
-ADD src /app/src
-ADD build.sbt /app/built.sbt
-#ADD conf /app/conf
-#ADD data /app/data
-RUN sbt clean assembly
 
+ADD target/scala-2.11/final-project.jar /app/target/final-project.jar
+
+#ADD project /app/project
+#ADD src /app/src
+#ADD build.sbt /app/built.sbt
+##ADD conf /app/conf
+##ADD data /app/data
+#RUN sbt clean assembly

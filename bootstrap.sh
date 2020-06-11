@@ -8,6 +8,7 @@ if [ -z "$SPARK_APPLICATION_JAR_LOCATION" ]; then
 	exit 1
 fi
 
+
 SPARK_HOME=/usr/local/spark
 
 #${SPARK_HOME}/bin/run-example SparkPi
@@ -16,6 +17,9 @@ ${SPARK_HOME}/bin/spark-submit \
   --class "Main" \
   --master spark://master:7077 \
   "${SPARK_APPLICATION_JAR_LOCATION}"
+
+rm -rf /tmp/data/bootstrap
+rm -rf /tmp/data/graph.json
 
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done
