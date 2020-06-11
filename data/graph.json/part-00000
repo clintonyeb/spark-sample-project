@@ -1,0 +1,92 @@
+{
+  "mark" : "bar",
+  "encoding" : {
+    "x" : {
+      "sort" : {
+        "field" : "users count",
+        "op" : "mean"
+      },
+      "field" : "spark",
+      "type" : "nominal"
+    },
+    "y" : {
+      "field" : "users_count",
+      "type" : "quantitative"
+    }
+  },
+  "description" : "Spark",
+  "data" : {
+    "values" : [
+      {
+        "EmployedVariance" : 0.7211119049491234,
+        "Population" : 0.85,
+        "UnEmployedMean" : 0.12233011285563712,
+        "EmployedMean" : 0.09722861293087057,
+        "UnEmployedVariance" : 4.21886288653481
+      },
+      {
+        "EmployedVariance" : 2.040388445958026,
+        "Population" : 0.45,
+        "UnEmployedMean" : 1.7444025049954746,
+        "EmployedMean" : 0.7304054641712087,
+        "UnEmployedVariance" : 3.5944359524347993
+      },
+      {
+        "EmployedVariance" : 1.494762412005175,
+        "Population" : 0.55,
+        "UnEmployedMean" : 0.010629661843858478,
+        "EmployedMean" : 0.2917490352876811,
+        "UnEmployedVariance" : 0.17911555737183274
+      },
+      {
+        "EmployedVariance" : 0.6776703588121255,
+        "Population" : 0.95,
+        "UnEmployedMean" : 0.1003873820014098,
+        "EmployedMean" : 0.18417019775718976,
+        "UnEmployedVariance" : 2.289456307428031
+      },
+      {
+        "EmployedVariance" : 11.776071555333345,
+        "Population" : 0.15,
+        "UnEmployedMean" : 0.3878822540826942,
+        "EmployedMean" : 0.4109999452025519,
+        "UnEmployedVariance" : 6.416253206656969
+      },
+      {
+        "EmployedVariance" : 7.3382586174899345,
+        "Population" : 0.25,
+        "UnEmployedMean" : 1.231263304448159,
+        "EmployedMean" : 0.901390375889579,
+        "UnEmployedVariance" : 2.2878158422155965
+      },
+      {
+        "EmployedVariance" : 4.893034027196417,
+        "Population" : 0.05,
+        "UnEmployedMean" : 1.357397522989125,
+        "EmployedMean" : 0.28729388465779315,
+        "UnEmployedVariance" : 21.26980358345294
+      },
+      {
+        "EmployedVariance" : 7.804199471456786,
+        "Population" : 0.35,
+        "UnEmployedMean" : 3.0865400114504657,
+        "EmployedMean" : 0.40265222290109143,
+        "UnEmployedVariance" : 17.51554286785145
+      },
+      {
+        "EmployedVariance" : 1.737296726272151,
+        "Population" : 0.65,
+        "UnEmployedMean" : 0.12729274767360746,
+        "EmployedMean" : 0.021431633003001948,
+        "UnEmployedVariance" : 0.3019966259884032
+      },
+      {
+        "EmployedVariance" : 0.4839002473228843,
+        "Population" : 0.75,
+        "UnEmployedMean" : 0.08957281291397451,
+        "EmployedMean" : 0.17350177325083413,
+        "UnEmployedVariance" : 1.6320044250583625
+      }
+    ]
+  }
+}
