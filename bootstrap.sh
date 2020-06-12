@@ -20,7 +20,9 @@ ${SPARK_HOME}/bin/spark-submit \
   --master spark://master:7077 \
   "${SPARK_APPLICATION_JAR_LOCATION}"
 
+python /app/graph-visual.py
 rm -rf /tmp/data/bootstrap
+
 
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done

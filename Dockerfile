@@ -20,13 +20,22 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 RUN apt-get update \
- && apt-get install -y curl unzip tar sudo openssh-server openssh-client rsync apt-utils wget gnupg software-properties-common
+ && apt-get install -y curl unzip tar sudo openssh-server openssh-client rsync apt-utils wget gnupg \
+ software-properties-common build-essential python-dev python3 python3-setuptools python3-pip  \
+ build-essential python3-dev python3-wheel python3-cffi libcairo2 libpango-1.0-0 \
+ libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
 
 # passwordless ssh
 RUN yes 'y' | ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key \
 && yes 'y' | ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key \
 && yes 'y' | ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa \
 && cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+
+# Python
+RUN ln -sfn /usr/bin/python3 /usr/bin/python \
+ && python -m pip install pygal cairosvg \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
 # JAVA
 RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add - && \
@@ -38,11 +47,6 @@ RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | s
 
 ENV JAVA_HOME /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64
 ENV PATH $PATH:$JAVA_HOME/bin
-
-# JAVAFX
-#RUN curl -# -L --retry 3 "https://download2.gluonhq.com/openjfx/11.0.2/openjfx-11.0.2_linux-x64_bin-sdk.zip" | unzip -d /usr/local/openjfx-11
-#ENV  PATH_TO_FX /usr/local/openjfx-11/lib
-
 
 # Hadoop
 ENV HADOOP_VERSION 3.0.0
@@ -92,26 +96,6 @@ RUN chown root:root /etc/bootstrap.sh \
 && chmod 700 /etc/bootstrap.sh
 ENV BOOTSTRAP /etc/bootstrap.sh
 
-# SBT/SCALA
-#ENV SBT_VERSION 1.3.12
-#RUN \
-#  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
-#  dpkg -i sbt-$SBT_VERSION.deb && \
-#  rm sbt-$SBT_VERSION.deb && \
-#  apt-get update && \
-#  apt-get install sbt && \
-#  sbt sbtVersion
-
-# ADD data /tmp/data
-
-# Copy the source code and build the application
-WORKDIR /app
-
+# Copy artefacts
 ADD target/scala-2.11/final-project.jar /app/target/final-project.jar
-
-#ADD project /app/project
-#ADD src /app/src
-#ADD build.sbt /app/built.sbt
-##ADD conf /app/conf
-##ADD data /app/data
-#RUN sbt clean assembly
+COPY graph-visual.py /app/graph-visual.py

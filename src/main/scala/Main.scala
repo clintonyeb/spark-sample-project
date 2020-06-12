@@ -1,5 +1,4 @@
 import org.apache.spark._
-import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -13,8 +12,8 @@ case class PopulationTable(
                           )
 
 object Main {
-  val NUM_ITERATION: Int = 1000
-  val NUM_POPULATION: Int = 10
+  var NUM_ITERATION: Int = 100
+  var NUM_POPULATION: Int = 10 // 1-10
 
   def sqr(x: Double): Double = x * x
 
@@ -33,6 +32,15 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     println("Application Started")
+
+    if (args.length != 0) {
+      if(args.length < 2) {
+        System.out.println("Malformed input arguments: Requires Num Of iterations && num of population")
+        System.exit(0)
+      }
+      NUM_ITERATION = args(0).toInt
+      NUM_POPULATION = args(1).toInt
+    }
 
     val spark = SparkSession.builder.appName("Bootstrap App").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
@@ -66,12 +74,11 @@ object Main {
       plot.toJson
     }
 
-    def estimate(populationBC: Broadcast[RDD[(Boolean, Int)]], sampleSize: Double): Unit = {
+    def estimate(population: RDD[(Boolean, Int)], sampleSize: Double): Unit = {
       println(s"Computing estimate for: $sampleSize")
 
-      val popSample: RDD[(Boolean, Int)] = populationBC.value
-        .sample(withReplacement = false, sampleSize)
-      val popSampleBroadCast: Broadcast[RDD[(Boolean, Int)]] = spark.sparkContext.broadcast(popSample)
+      val popSample: RDD[(Boolean, Int)] = population
+        .sample(withReplacement = false, sampleSize).cache()
 
       def saveToFile(index: Int, items: RDD[(Boolean, (Double, Double, Double))]): Unit = {
         items.coalesce(numPartitions = 1)
@@ -83,7 +90,7 @@ object Main {
       }
 
       def resample(): RDD[(Boolean, (Double, Double, Double))] = {
-        val newSample = popSampleBroadCast.value.sample(withReplacement = true, 1)
+        val newSample = popSample.sample(withReplacement = true, 1)
         newSample.groupByKey().map(x => (x._1, (sampleSize, mean(x._2), variance(x._2))))
       }
 
@@ -117,9 +124,8 @@ object Main {
     println("Computing Original Metrics")
     val population: RDD[(Boolean, Int)] = data
       .map(p => if (p.getString(0) == "Yes") (true, p.getInt(1)) else (false, p.getInt(1)))
-      .rdd
-    val populationBC: Broadcast[RDD[(Boolean, Int)]] = spark.sparkContext.broadcast(population)
-    val popGroup: RDD[(Boolean, (Double, Double))] = populationBC.value
+      .rdd.cache
+    val popGroup: RDD[(Boolean, (Double, Double))] = population
       .groupByKey()
       .map(x => (x._1, (mean(x._2), variance(x._2))))
       .cache()
@@ -133,14 +139,14 @@ object Main {
     println("Starting computations for estimates")
 //    List(.05, .15, .25, .35, .45, .55, .65, .75, .85, .95)
     val percentages = 1.to(NUM_POPULATION).map(x => x * 0.1 + 0.05)
-    percentages.par.foreach(p => estimate(populationBC, p))
+    percentages.par.foreach(p => estimate(population, p))
 
     println("Estimates done. Retrieving from filesystem")
     val estimates: RDD[(Boolean, (Double, Double, Double))] = retrieveEstimates()
     val estimatesGrouped: RDD[((Boolean, Double), (Double, Double))] = estimates
       .map(x => ((x._1, x._2._1), (x._2._2, x._2._3)))
       .reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2))
-      .map(x => ((x._1._1, x._1._2), (x._2._1 / 1000, x._2._2 / 1000)))
+      .map(x => ((x._1._1, x._1._2), (x._2._1 / NUM_POPULATION, x._2._2 / NUM_POPULATION)))
 
     val estimatesGroupedBySampleSize: RDD[(Double, Iterable[(Boolean, (Double, Double))])] =
       estimatesGrouped.map(x => (x._1._2, (x._1._1, (x._2._1, x._2._2)))).groupByKey()
