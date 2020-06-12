@@ -3,7 +3,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 
-case class PopulationTable(Population: Double, UnEmployedMean: Double, UnEmployedVariance: Double, EmployedMean: Double, EmployedVariance: Double)
+case class PopulationTable(Percentage: Double, UnEmployedMean: Double, UnEmployedVariance: Double, EmployedMean: Double, EmployedVariance: Double)
 
 object Main {
 
