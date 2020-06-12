@@ -22,8 +22,6 @@ ${SPARK_HOME}/bin/spark-submit \
 
 rm -rf /tmp/data/bootstrap
 
-python graph-visual.py
-
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done
 fi

@@ -23,6 +23,11 @@ docker run \
 --link master \
 $name /etc/bootstrap.sh #-bash
 
+# Construct graph
+source venv/bin/activate
+python graph-visual.py
+deactivate
+
 # copy output to local
 #rm -rf ./output
 #docker cp $name:/output ./output

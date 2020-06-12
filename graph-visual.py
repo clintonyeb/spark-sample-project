@@ -30,4 +30,4 @@ line_chart.add('Employed Variance', list(map(get_employed_variance, values)))
 line_chart.add('UnEmployed Mean', list(map(get_unemployed_mean, values)))
 line_chart.add('UnEmployed Variance', list(map(get_unemployed_variance, values)))
 
-line_chart.render_to_png('graph.png')
+line_chart.render_to_png('data/graph.png')
