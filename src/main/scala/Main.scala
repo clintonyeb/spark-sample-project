@@ -74,8 +74,7 @@ object Main {
       println(s"Computing estimate for: $sampleSize")
 
       def saveToFile(index: Int, items: RDD[(Boolean, (Double, Double, Double))]): Unit = {
-        items.coalesce(numPartitions = 1)
-          .saveAsObjectFile(filePath(s"bootstrap/estimate_${fmt(sampleSize)}_$index"))
+        items.saveAsObjectFile(filePath(s"bootstrap/estimate_${fmt(sampleSize)}_$index"))
       }
 
       def fmt(num: Double): String = {
