@@ -99,3 +99,5 @@ ENV BOOTSTRAP /etc/bootstrap.sh
 # Copy artefacts
 ADD target/scala-2.11/final-project.jar /app/target/final-project.jar
 COPY graph-visual.py /app/graph-visual.py
+
+CMD ["/etc/bootstrap.sh", "-d"]

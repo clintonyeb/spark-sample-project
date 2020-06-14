@@ -12,39 +12,30 @@ case class PopulationTable(
                           )
 
 object Main {
-  var NUM_ITERATION: Int = 100
-  var NUM_POPULATION: Int = 10 // 1-10
-
-  def sqr(x: Double): Double = x * x
-
-  def mean[T](ts: Iterable[T] )( implicit num: Numeric[T] ): Double = {
-    num.toDouble( ts.sum ) / ts.size
-  }
-
-  def variance[T](ts: Iterable[T] )( implicit num: Numeric[T] ): Double = {
-    val m = mean(ts)
-    ts.map(x => sqr(num.toDouble(x) - m)).sum / (ts.size - 1)
-  }
-
-  def filePath(file: String): String = {
-    s"file:///tmp/data/$file"
-  }
+  val NUM_ITERATION: Int = 100
+  val NUM_POPULATION: Int = 10 // 1-10
 
   def main(args: Array[String]): Unit = {
     println("Application Started")
 
-    if (args.length != 0) {
-      if(args.length < 2) {
-        System.out.println("Malformed input arguments: Requires Num Of iterations && num of population")
-        System.exit(0)
-      }
-      NUM_ITERATION = args(0).toInt
-      NUM_POPULATION = args(1).toInt
-    }
-
     val spark = SparkSession.builder.appName("Bootstrap App").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     import spark.implicits._
+
+    def sqr(x: Double): Double = x * x
+
+    def mean[T](ts: Iterable[T] )( implicit num: Numeric[T] ): Double = {
+      num.toDouble( ts.sum ) / ts.size
+    }
+
+    def variance[T](ts: Iterable[T] )( implicit num: Numeric[T] ): Double = {
+      val m = mean(ts)
+      ts.map(x => sqr(num.toDouble(x) - m)).sum / (ts.size - 1)
+    }
+
+    def filePath(file: String): String = {
+      s"file:///tmp/data/$file"
+    }
 
     def showCategoriesComputation(data: RDD[(Boolean, (Double, Double))]): Unit = {
       val df = data.map(x => (if (x._1) "Yes" else "No", x._2._1, x._2._2))
@@ -74,11 +65,13 @@ object Main {
       plot.toJson
     }
 
+    /**
+     * Computes the estimates for the given population with given sampleSize
+     * @param population Population to compute estimates from
+     * @param sampleSize the sample size to consider
+     */
     def estimate(population: RDD[(Boolean, Int)], sampleSize: Double): Unit = {
       println(s"Computing estimate for: $sampleSize")
-
-      val popSample: RDD[(Boolean, Int)] = population
-        .sample(withReplacement = false, sampleSize).cache()
 
       def saveToFile(index: Int, items: RDD[(Boolean, (Double, Double, Double))]): Unit = {
         items.coalesce(numPartitions = 1)
@@ -89,8 +82,8 @@ object Main {
         num.toString.replace(".", "_")
       }
 
-      def resample(): RDD[(Boolean, (Double, Double, Double))] = {
-        val newSample = popSample.sample(withReplacement = true, 1)
+      def resample(sample: RDD[(Boolean, Int)]): RDD[(Boolean, (Double, Double, Double))] = {
+        val newSample = sample.sample(withReplacement = true, 1)
         newSample.groupByKey().map(x => (x._1, (sampleSize, mean(x._2), variance(x._2))))
       }
 
@@ -100,11 +93,14 @@ object Main {
         df.show()
       }
 
+      // estimate program starts here
 
+      val popSample: RDD[(Boolean, Int)] = population
+        .sample(withReplacement = false, sampleSize).cache()
 
-      1.to(NUM_ITERATION).par.foreach(x => {
+      0.until(NUM_ITERATION).par.foreach(x => {
         println(s"Computing estimate for sampleSize: $sampleSize, Iteration: $x")
-        val estimate: RDD[(Boolean, (Double, Double, Double))] = resample()
+        val estimate: RDD[(Boolean, (Double, Double, Double))] = resample(popSample)
         println(s"Results for sampleSize: $sampleSize, Iteration: $x")
         showCategoriesComputation(estimate)
         saveToFile(x, estimate)
@@ -112,6 +108,8 @@ object Main {
 
       println(s"Computations done for sampleSize: $sampleSize")
     }
+
+    // main program starts here
 
     println("Reading CSV file")
     val csv = spark.read.option("header", "true").option("inferSchema", "true").csv(filePath("arrests.csv"))
@@ -122,9 +120,13 @@ object Main {
     // employment("Yes"/"NO") and age(Int)
     // No: false, Yes: true
     println("Computing Original Metrics")
+    
+    // convert data to integer category
     val population: RDD[(Boolean, Int)] = data
       .map(p => if (p.getString(0) == "Yes") (true, p.getInt(1)) else (false, p.getInt(1)))
       .rdd.cache
+
+    // group population by category and calculate mean and variance
     val popGroup: RDD[(Boolean, (Double, Double))] = population
       .groupByKey()
       .map(x => (x._1, (mean(x._2), variance(x._2))))
@@ -133,20 +135,27 @@ object Main {
     // Display for original
     showCategoriesComputation(popGroup)
 
+    // collect values for the original categories
     val popNo: (Double, Double) = popGroup.filter(x => !x._1).first()._2
     val popYes: (Double, Double) = popGroup.filter(x => x._1).first()._2
 
     println("Starting computations for estimates")
 //    List(.05, .15, .25, .35, .45, .55, .65, .75, .85, .95)
-    val percentages = 1.to(NUM_POPULATION).map(x => x * 0.1 + 0.05)
+    val percentages = 0.until(NUM_POPULATION).map(x => x * 0.1 + 0.05).map(x => "%.2f".format(x).toDouble)
+
+    // calculates estimate for each sample size
     percentages.par.foreach(p => estimate(population, p))
 
     println("Estimates done. Retrieving from filesystem")
+
+    // retrieve estimates from file system
     val estimates: RDD[(Boolean, (Double, Double, Double))] = retrieveEstimates()
+
+    // group and summarize estimated populations
     val estimatesGrouped: RDD[((Boolean, Double), (Double, Double))] = estimates
       .map(x => ((x._1, x._2._1), (x._2._2, x._2._3)))
       .reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2))
-      .map(x => ((x._1._1, x._1._2), (x._2._1 / NUM_POPULATION, x._2._2 / NUM_POPULATION)))
+      .map(x => ((x._1._1, x._1._2), (x._2._1 / NUM_ITERATION, x._2._2 / NUM_ITERATION)))
 
     val estimatesGroupedBySampleSize: RDD[(Double, Iterable[(Boolean, (Double, Double))])] =
       estimatesGrouped.map(x => (x._1._2, (x._1._1, (x._2._1, x._2._2)))).groupByKey()

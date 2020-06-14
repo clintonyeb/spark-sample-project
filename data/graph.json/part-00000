@@ -14,39 +14,74 @@
   "data" : {
     "values" : [
       {
-        "EmployedVariance" : 98.98508864122074,
-        "UnEmployedMean" : 99.00200852193946,
-        "Percentage" : 0.35000000000000003,
-        "EmployedMean" : 98.99687338382616,
-        "UnEmployedVariance" : 98.98385921458384
-      },
-      {
-        "EmployedVariance" : 98.93566956782247,
-        "UnEmployedMean" : 98.96697219197887,
-        "Percentage" : 0.45,
-        "EmployedMean" : 98.99466103761335,
-        "UnEmployedVariance" : 98.91568293459224
-      },
-      {
-        "EmployedVariance" : 98.99727032121122,
-        "UnEmployedMean" : 99.00233102916215,
-        "Percentage" : 0.55,
-        "EmployedMean" : 98.99173995487968,
-        "UnEmployedVariance" : 99.0164765707533
-      },
-      {
-        "EmployedVariance" : 99.04380817856676,
-        "UnEmployedMean" : 99.01272648087564,
-        "Percentage" : 0.15000000000000002,
-        "EmployedMean" : 99.01401701865515,
-        "UnEmployedVariance" : 99.27526088145903
-      },
-      {
-        "EmployedVariance" : 98.94851196349646,
-        "UnEmployedMean" : 98.99359824747576,
+        "EmployedVariance" : 0.6380942722489232,
+        "UnEmployedMean" : 0.9784764495955799,
         "Percentage" : 0.25,
-        "EmployedMean" : 98.99832811774057,
-        "UnEmployedVariance" : 99.00965772118103
+        "EmployedMean" : 0.25016373002863634,
+        "UnEmployedVariance" : 0.5275608778611858
+      },
+      {
+        "EmployedVariance" : 0.2997616161046241,
+        "UnEmployedMean" : 0.018657775427520555,
+        "Percentage" : 0.95,
+        "EmployedMean" : 0.08953739866056083,
+        "UnEmployedVariance" : 0.08462741702743974
+      },
+      {
+        "EmployedVariance" : 6.568451427083495,
+        "UnEmployedMean" : 4.535270461519061,
+        "Percentage" : 0.15,
+        "EmployedMean" : 0.07114448175104918,
+        "UnEmployedVariance" : 10.474923415515661
+      },
+      {
+        "EmployedVariance" : 7.992436114765972,
+        "UnEmployedMean" : 0.52084975614152,
+        "Percentage" : 0.05,
+        "EmployedMean" : 3.9990179943733266,
+        "UnEmployedVariance" : 0.3616567555219952
+      },
+      {
+        "EmployedVariance" : 0.08434249765110961,
+        "UnEmployedMean" : 0.08703654582249794,
+        "Percentage" : 0.85,
+        "EmployedMean" : 0.1102748886470008,
+        "UnEmployedVariance" : 0.7551079096995601
+      },
+      {
+        "EmployedVariance" : 9.271504427044523,
+        "UnEmployedMean" : 1.149231730757851,
+        "Percentage" : 0.35,
+        "EmployedMean" : 1.1477120714421476,
+        "UnEmployedVariance" : 3.037046139977484
+      },
+      {
+        "EmployedVariance" : 1.5851053687660666,
+        "UnEmployedMean" : 0.9768776315765997,
+        "Percentage" : 0.65,
+        "EmployedMean" : 0.41387534606044735,
+        "UnEmployedVariance" : 4.169746765708343
+      },
+      {
+        "EmployedVariance" : 2.381170323037425,
+        "UnEmployedMean" : 0.10920630106873351,
+        "Percentage" : 0.45,
+        "EmployedMean" : 0.14655884672946734,
+        "UnEmployedVariance" : 0.4053464688423291
+      },
+      {
+        "EmployedVariance" : 2.9077935860727764,
+        "UnEmployedMean" : 0.1236925238372682,
+        "Percentage" : 0.55,
+        "EmployedMean" : 0.6363466788291237,
+        "UnEmployedVariance" : 0.3751739837668361
+      },
+      {
+        "EmployedVariance" : 1.0869306549125914,
+        "UnEmployedMean" : 0.20048410449118279,
+        "Percentage" : 0.75,
+        "EmployedMean" : 0.400223467291367,
+        "UnEmployedVariance" : 1.9625083242139347
       }
     ]
   }

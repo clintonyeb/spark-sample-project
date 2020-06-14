@@ -57,7 +57,12 @@ services:
     volumes:
       - ./conf/worker:/conf
       - ./data:/tmp/data
-
+  app:
+    build:
+      context: .
+    container_name: spark-app
+    volumes:
+      - ./data:/tmp/data
 
 volumes:
   mydata:
